@@ -1,25 +1,37 @@
 package core.basesyntax.impl;
 
 import core.basesyntax.Storage;
-import java.util.Objects;
 
 public class StorageImpl<K, V> implements Storage<K, V> {
     private static final int MAX_ELEMENTS_IN_STORAGE = 10;
     private static final int INITIAL_SIZE_OF_STORAGE = 0;
 
-    private K[] keys = (K[]) new Object[MAX_ELEMENTS_IN_STORAGE];
-    private V[] values = (V[]) new Object[MAX_ELEMENTS_IN_STORAGE];
-    private int storageSize = INITIAL_SIZE_OF_STORAGE;
+    private K[] keys;
+    private V[] values;
+    private int storageSize;
+
+    public StorageImpl() {
+        keys = (K[]) new Object[MAX_ELEMENTS_IN_STORAGE];
+        values = (V[]) new Object[MAX_ELEMENTS_IN_STORAGE];
+        storageSize = INITIAL_SIZE_OF_STORAGE;
+    }
+
+    private int findKeyIndex(K key) {
+        for (int i = 0; i < keys.length; i++) {
+            if ((keys[i] == null && key == null) || (keys[i] != null && keys[i].equals(key))) {
+                return i;
+            }
+        }
+        return -1;
+    }
 
     @Override
     public void put(K key, V value) throws RuntimeException {
-        for (int i = 0; i < storageSize; i++) {
-            if (Objects.equals(key, keys[i])) {
-                values[i] = value;
-                return;
-            }
+        int keyIndex = findKeyIndex(key);
+        if (keyIndex != - 1) {
+            values[keyIndex] = value;
+            return;
         }
-
         if (storageSize == MAX_ELEMENTS_IN_STORAGE) {
             throw new RuntimeException("Storage is full");
         } else {
@@ -31,10 +43,9 @@ public class StorageImpl<K, V> implements Storage<K, V> {
 
     @Override
     public V get(K key) {
-        for (int i = 0; i < storageSize; i++) {
-            if (Objects.equals(key, keys[i])) {
-                return values[i];
-            }
+        int keyIndex = findKeyIndex(key);
+        if (keyIndex != -1) {
+            return values[keyIndex];
         }
         return null;
     }
